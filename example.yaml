@@ -1,0 +1,18 @@
+# Example YAML input file for LLM Fingerprint Classifier
+# Usage: python3 main.py example.yaml
+#
+# Keys are question names (see README for full list).
+# Values can be comma-separated strings, numbers, or YAML lists.
+
+language: en
+answers:
+  Random number (1-100): 42, 42, 37, 57
+  Random number (1-10): 7
+  Favorite number: 7
+  Random letter: g, m, k
+  Random word: serendipity
+  Random color: blue
+  Favorite color: blue
+  Random animal: elephant
+  Random city: tokyo, paris
+  Coin flip: heads, tails

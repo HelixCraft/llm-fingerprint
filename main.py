@@ -28,6 +28,7 @@ VERSION = "2.0.0"
 
 CELLS = [f"{tid}|lang" for tid, _, _ in TASKS]
 TASK_MAP = {tid: (label, ttype) for tid, label, ttype in TASKS}
+LABEL_TO_TID = {label: tid for tid, label, _ in TASKS}
 OUT_FILE = os.path.join(_HERE, "last_result.json")
 
 
@@ -150,6 +151,69 @@ def save(obs: dict, clf: _C, method: str):
     return OUT_FILE
 
 
+def load_yaml(path: str) -> dict:
+    """Load answers from a YAML file.
+
+    Format:
+        language: en
+        answers:
+          Random number (1-100): 42, 37, 57
+          Favorite number: 7
+          Coin flip: heads, tails
+          ...
+    """
+    import yaml
+    with open(path) as f:
+        data = yaml.safe_load(f)
+
+    if not isinstance(data, dict):
+        print(f"  Error: {path} must contain a YAML mapping.")
+        sys.exit(1)
+
+    lang = str(data.get("language", "en"))
+    if lang not in LANG_CODES:
+        print(f"  Error: unknown language '{lang}'. Choose: {', '.join(LANG_CODES)}")
+        sys.exit(1)
+
+    raw_answers = data.get("answers", {})
+    if not isinstance(raw_answers, dict) or not raw_answers:
+        print(f"  Error: {path} must contain an 'answers' mapping.")
+        sys.exit(1)
+
+    obs = {}
+    for key, value in raw_answers.items():
+        key = key.strip()
+        tid = LABEL_TO_TID.get(key, key)
+        _, ttype = TASK_MAP.get(tid, (None, None))
+        if ttype is None:
+            print(f"  Warning: unknown question '{key}', skipping.")
+            continue
+        cell = f"{tid}|{lang}"
+
+        if isinstance(value, str):
+            parts = [p.strip() for p in value.split(",") if p.strip()]
+        elif isinstance(value, (int, float)):
+            parts = [str(value)]
+        elif isinstance(value, list):
+            parts = [str(v).strip() for v in value if str(v).strip()]
+        else:
+            print(f"  Warning: invalid value for '{key}', skipping.")
+            continue
+
+        answers = normalize_answers(",".join(parts), ttype)
+        if answers:
+            obs[cell] = answers
+            print(f"  Loaded: {key:30s} → {answers}")
+        else:
+            print(f"  Warning: no valid answers for '{key}', skipping.")
+
+    if not obs:
+        print("  Error: no valid answers found in YAML file.")
+        sys.exit(1)
+
+    return obs, lang
+
+
 def main():
     banner()
 
@@ -160,6 +224,17 @@ def main():
     print(f"{clf.n} models, {len(clf.cells)} cells.\n")
 
     method = "jsd"
+
+    if len(sys.argv) > 1:
+        path = sys.argv[1]
+        print(f"  Loading answers from: {path}\n")
+        obs, lang = load_yaml(path)
+        print(f"\n  Language: {LANG_CODES[lang]}\n")
+        display(clf, obs, method=method)
+        path = save(obs, clf, method=method)
+        print(f"  Results saved: {path}\n")
+        print("  Done.\n")
+        return
 
     while True:
         lang = pick_language()
