@@ -10,12 +10,21 @@ Built on the methodology and dataset from:
 
 ## Usage
 
+### Interactive mode
+
 ```bash
-cd v3/
 python3 main.py
 ```
 
 Answer each question (comma-separated for multiple responses). Leave empty to skip.
+
+### Batch mode (YAML file)
+
+```bash
+python3 main.py example.yaml
+```
+
+Answers are loaded from a YAML file and classification runs immediately. See `example.yaml` for the format.
 
 ```
 Language [en/ru/zh/ar] (enter=en): en
@@ -85,9 +94,10 @@ The fingerprint database contains 170 models fingerprinted through OpenRouter, c
 
 ```
 v3/
-├── main.py               # Interactive CLI
+├── main.py               # Interactive CLI + YAML batch loader
 ├── fingerprint.py        # Normalization, classifier, JSD/Naive Bayes
 ├── test_fingerprint.py   # Test suite (6 suites)
+├── example.yaml          # Example YAML input file
 ├── data/
 │   └── models.json       # 170 model fingerprints
 └── README.md
