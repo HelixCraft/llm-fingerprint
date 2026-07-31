@@ -102,3 +102,7 @@ v3/
 │   └── models.json       # 170 model fingerprints
 └── README.md
 ```
+
+## License
+
+Licensed under the [GNU General Public License v3.0](LICENSE) — free to use, modify, and share, provided that derivative works are also released under GPLv3.
