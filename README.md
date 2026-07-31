@@ -105,4 +105,4 @@ v3/
 
 ## License
 
-Licensed under the [GNU General Public License v3.0](LICENSE) — free to use, modify, and share, provided that derivative works are also released under GPLv3.
+This project is licensed under the [GNU General Public License v3.0](LICENSE).
